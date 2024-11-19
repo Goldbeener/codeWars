@@ -1,4 +1,10 @@
 /**
+ * 连续调用
+ *
+ * 与curry函数不太一样
+ * curry函数，处理的是固定参数长度的函数，
+ * 超过长度的参数不被处理或者直接报错
+ *
  * add(1)(2)(3); // == 6
  * add(1)(2)(3)(4); //  == 10
  * add(1)(2)(3)(4)(5); // == 15
@@ -32,7 +38,33 @@
  *
  */
 
+/*
+ * 返回值始终是一个函数，根据最后调用情况，
+ *   有参数的话，与之前的叠加，使用闭包
+ *   没有参数的话，返回之前参数的和
+ *
+ * 额外自定义了valueOf和toString函数
+ */
+function sumEmpty(x) {
+  let ans = x;
+
+  function func(y) {
+    return y === undefined ? ans : ((ans += y), func);
+  }
+
+  func.toString = func.valueOf = function () {
+    return ans;
+  };
+
+  return func;
+}
+
+const addTwo = sumEmpty(2);
+console.log(addTwo(2)(3)());
+
 function sum(x) {
+  // helper 是一次性的，后面返回的都是f函数
+  // f函数 也是类似的 有传参数就叠加，没有传参数，就返回总值
   function helper(y, x) {
     if (x === undefined) {
       return y;
@@ -53,22 +85,4 @@ function sum(x) {
   return helper(x, 0);
 }
 
-console.log(sum(1)(2) + 4);
-
-function sumEmpty(x) {
-  let temp = x;
-
-  function func(y) {
-    return y === undefined ? temp : ((temp += y), func);
-  }
-
-  func.toString = func.valueOf = function () {
-    return temp;
-  };
-
-  return func;
-}
-
-const addTwo = sumEmpty(2);
-
-console.log(+addTwo(2));
+console.log(sum(1)(2)());
