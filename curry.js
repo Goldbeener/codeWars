@@ -20,16 +20,27 @@ function curry(fn) {
       return fn.apply(this, args);
     } else {
       return function (...args2) {
+        // 手动收集每一步传递的参数
         return curried.apply(this, [...args, ...args2]);
       };
     }
   };
 }
 
+function enhanceCurry(fn) {
+  return function recursor(...args) {
+    return args.length < fn.length
+      ? fn.bind(this, ...args) // bind函数 内部自动存储传递的参数
+      : fn.call(this, ...args);
+  };
+}
+
 function sum(a, b, c) {
+  // console.log('???', Array.prototype.slice.apply(arguments));
+  // console.log('???', [].slice.apply(arguments));
   return a + b + c;
 }
 
-let curriedSum = curry(sum);
+let curriedSum = enhanceCurry(sum);
 
-console.log('???', curriedSum(1, 2, 3, 4));
+console.log('???', curriedSum(1, 3)(5, 4));
